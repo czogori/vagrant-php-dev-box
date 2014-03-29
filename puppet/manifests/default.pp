@@ -31,39 +31,12 @@ class system-update {
   }
 }
 
-class nginx-setup {
-
-  include nginx
-
-  file { "/etc/nginx/sites-available/php-fpm":
-    owner  => root,
-    group  => root,
-    mode   => 664,
-    source => "/vagrant/conf/nginx/default",
-    require => Package["nginx"],
-    notify => Service["nginx"],
-  }
-
-  file { "/etc/nginx/sites-enabled/default":
-    owner  => root,
-    ensure => link,
-    target => "/etc/nginx/sites-available/php-fpm",
-    require => Package["nginx"],
-    notify => Service["nginx"],
-  }
-}
-
 class development {
 
-  $devPackages = [ "curl", "git", "nodejs", "npm", "capistrano", "rubygems", "openjdk-7-jdk", "libaugeas-ruby" ]
+  $devPackages = [ "curl", "git", "capistrano", "rubygems",  "libaugeas-ruby" ]
   package { $devPackages:
     ensure => "installed",
     require => Exec['apt-get update'],
-  }
-
-  exec { 'install less using npm':
-    command => 'npm install less -g',
-    require => Package["npm"],
   }
 
   exec { 'install capifony using RubyGems':
@@ -176,7 +149,6 @@ include system-update
 include php::fpm
 include devbox_php_fpm
 
-include nginx-setup
 include apache
 include mysql
 
@@ -187,5 +159,4 @@ class {'mongodb':
 include phpqatools
 include development
 include symfony-standard
-
 
